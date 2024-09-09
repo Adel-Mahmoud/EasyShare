@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=.5">
     <title>شيت الجمعية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,9 +19,9 @@
           font-variation-settings:
             "slnt" 0;
         }
-        .container{
+        .tabel-container{
           width: 100%;
-          overflow-x: scroll;
+          overflow-y: scroll;
         }
         .custom-header {
             background-color: navy;
@@ -52,214 +52,360 @@
 </head>
 <body dir="rtl">
   <div class="container mt-4">
-  <div class="d-flex justify-content-between">
-    <button id="exportButton" class="btn btn-success mt-2">تصدير البيانات</button>
-  </div>
-  
-  <div class="card mt-3">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-6">
-          <br>
-          <button id="importButton" class="btn btn-secondary">استيراد البيانات</button>
+    <h1 class="text-primary text-center mx-3">
+      <b>
+      إدارة الجمعية 
+      </b>
+    </h1>
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6">
+            <label for="firstDate">تاريخ البدء </label>
+            <input class="form-control mb-3" type="date" id="firstDate" />
+          </div>
+          <div class="col-6">
+            <label for="number">عدد الأعضاء</label>
+            <input class="form-control mb-3" type="number" id="number" value="2" />
+          </div>
         </div>
-        <div class="col-6">
-          <label for="number">عدد الأعضاء</label>
-          <input class="form-control mb-3" type="number" id="number" value="5" />
-        </div>
+        <button id="applyButton" class="btn btn-primary mt-2">إبداء</button>
       </div>
-      <label for="firstDate">تاريخ بداية الجمعية</label>
-      <input class="form-control mb-3" type="date" id="firstDate" />
-      <button id="applyButton" class="btn btn-primary mt-2">تطبيق</button>
     </div>
+    <div class="d-flex table-responsive mt-3 tabel-container" dir="rtl">
+      <table class="table table-bordered">
+        <thead class="bg-primary text-white">
+          <tr>
+            <th colspan="4" class="text-center">شيت الجمعية</th>
+          </tr>
+          <tr>
+            <th rowspan="2">م</th>
+            <th rowspan="2">الاسم</th>
+            <th rowspan="2">تاريخ القبض</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+  
+      <table class="table table-bordered table2 alert-primary" dir="rtl">
+        <thead>
+          <tr id="namesRow"></tr>
+          <tr id="datesRow"></tr>
+        </thead>
+        <tbody id="checkboxBody"></tbody>
+      </table>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <button id="exportButton" class="btn btn-success alert-success">حفظ البيانات</button>
+        <button id="importButton" class="btn btn-secondary">جلب البيانات</button>
+      </div>
+      <div class="col-12 col-md-6">
+        <button id="exportToFile" class="btn btn-success alert-success">تصدير ملف</button>
+        <label for="importFromFile" class="btn btn-secondary">استيراد ملف</label>
+        <input type="file" id="importFromFile" class="d-none" accept=".json"/>
+      </div>
+    </div>
+    <br />
   </div>
-
-  <div class="d-flex table-responsive mt-3" dir="rtl">
-    <table class="table table-bordered">
-      <thead class="bg-primary text-white">
-        <tr>
-          <th colspan="4" class="text-center">شيت الجمعية</th>
-        </tr>
-        <tr>
-          <th rowspan="2">م</th>
-          <th rowspan="2">الاسم</th>
-          <th rowspan="2">تاريخ القبض</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <table class="table table-bordered table2 alert-primary" dir="rtl">
-      <thead>
-        <tr id="namesRow"></tr>
-        <tr id="datesRow"></tr>
-      </thead>
-      <tbody id="checkboxBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-  $(document).ready(function () {
-    $('#applyButton').click(function () {
-        var numberOfSubscribers = parseInt($('#number').val());
-        var firstDate = new Date($('#firstDate').val());
-        var tbody = $('table tbody').first();
-        tbody.empty();
-        $('#namesRow').empty();
-        $('#datesRow').empty();
-        for (var i = 0; i < numberOfSubscribers; i++) {
-            var newDate = new Date(firstDate);
-            newDate.setMonth(newDate.getMonth() + i);
-            var formattedDate = newDate.toISOString().split('T')[0];
-            var newRow = `
-                <tr class="custom-row" id="row_${i}">
-                    <td>${i + 1}</td>
-                    <td><input type="text" class="form-control subscriber-name" style="min-width:150px;" data-index="${i}" /></td>
-                    <td><span class="view-date">${formattedDate}</span></td>
-                </tr>`;
-            tbody.append(newRow);
-            $('#datesRow').append(`<th class="text-center">${formattedDate}</th>`);
-            $('#namesRow').append(`<td><span id="name_${i}">${i+1}</span></td>`);
-        }
-        var checkboxBody = $('#checkboxBody');
-        checkboxBody.empty();
-        for (var i = 0; i < numberOfSubscribers; i++) {
-            var newRow = `<tr>`;
-            for (var j = 0; j < numberOfSubscribers; j++) {
-                newRow += ` <td>
-                                <div class="form-check">
-                                  <input class="form-check-input checkbox" type="checkbox" data-row="${j}">
-                                </div>
-                            </td>`;
-            }
-            newRow += `</tr>`;
-            checkboxBody.append(newRow);
-        }
-       /* var sequenceRow = `<tr>`;
-        for (var k = 0; k < numberOfSubscribers; k++) {
-            sequenceRow += `<td class="custom-row">${k + 1}</td>`;
-        }
-        sequenceRow += `</tr>`;
-        checkboxBody.prepend(sequenceRow); */
-    });
-    $(document).on('change', '.checkbox', function () {
-        var rowIndex = $(this).data('row');
-        var allChecked = true;
-        $(`.checkbox[data-row="${rowIndex}"]`).each(function () {
-            if (!$(this).is(':checked')) {
-                allChecked = false;
-            }
-        });
-        if (allChecked) {
-            $(`#row_${rowIndex}`).addClass('bg-info');
-        } else {
-            $(`#row_${rowIndex}`).removeClass('bg-info');
-        }
-    });
-    $(document).on('input', '.subscriber-name', function () {
-        var index = $(this).data('index');
-        var nameValue = $(this).val();
-        // $(`#name_${index}`).text(nameValue);
-    });
-  });
-</script>
-<script>
-  $(document).ready(function () {
-    $('#exportButton').click(function () {
-        var tableData = [];
-        $('table tbody .custom-row').each(function (index, row) {
-            var name = $(row).find('.subscriber-name').val();
-            var date = $(row).find('.view-date').text();
-            var checkboxes = [];
-
-            $(`.checkbox[data-row="${index}"]`).each(function () {
-                checkboxes.push($(this).is(':checked'));
-            });
-
-            tableData.push({
-                name: name,
-                date: date,
-                checkboxes: checkboxes
-            });
-        });
-        localStorage.setItem('tableData', JSON.stringify(tableData));
-        alert('Data exported successfully!');
-    });
-    $('#importButton').click(function () {
-        var tableData = JSON.parse(localStorage.getItem('tableData'));
-        if (tableData) {
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#applyButton').click(function () {
+          if($('#firstDate').val() !== ''){
+            var numberOfSubscribers = parseInt($('#number').val());
+            var firstDate = new Date($('#firstDate').val());
             var tbody = $('table tbody').first();
             tbody.empty();
             $('#namesRow').empty();
             $('#datesRow').empty();
-            var checkboxBody = $('#checkboxBody');
-            checkboxBody.empty();
-
-            tableData.forEach(function (data, i) {
+            for (var i = 0; i < numberOfSubscribers; i++) {
+                var newDate = new Date(firstDate);
+                newDate.setMonth(newDate.getMonth() + i);
+                var formattedDate = newDate.toISOString().split('T')[0];
                 var newRow = `
                     <tr class="custom-row" id="row_${i}">
                         <td>${i + 1}</td>
-                        <td><input type="text" class="form-control subscriber-name" data-index="${i}" value="${data.name}" style="min-width:150px;"/></td>
-                        <td><span class="view-date">${data.date}</span></td>
+                        <td><input type="text" class="form-control subscriber-name" style="min-width:150px;" data-index="${i}" /></td>
+                        <td><span class="view-date">${formattedDate}</span></td>
                     </tr>`;
                 tbody.append(newRow);
-                $('#datesRow').append(`<th class="text-center">${data.date}</th>`);
+                $('#datesRow').append(`<th class="text-center">${formattedDate}</th>`);
                 $('#namesRow').append(`<td><span id="name_${i}">${i+1}</span></td>`);
-            });
-
-            for (var j = 0; j < tableData.length; j++) {
-                var newCheckboxRow = `<tr>`;
-                tableData.forEach(function (data, i) {
-                    var isChecked = data.checkboxes[j] ? 'checked' : '';
-                    newCheckboxRow += `<td>
-                        <div class="form-check">
-                            <input class="form-check-input checkbox" type="checkbox" data-row="${i}" data-column="${j}" ${isChecked}>
-                        </div>
-                    </td>`;
-                });
-                newCheckboxRow += `</tr>`;
-                checkboxBody.append(newCheckboxRow);
             }
-
-            tableData.forEach(function (data, i) {
-                var allChecked = data.checkboxes.every(Boolean);
-                if (allChecked) {
-                    $(`#row_${i}`).addClass('bg-info');
+            var checkboxBody = $('#checkboxBody');
+            checkboxBody.empty();
+            for (var i = 0; i < numberOfSubscribers; i++) {
+                var newRow = `<tr>`;
+                for (var j = 0; j < numberOfSubscribers; j++) {
+                    newRow += ` <td>
+                                    <div class="form-check">
+                                      <input class="form-check-input checkbox" type="checkbox" data-row="${j}">
+                                    </div>
+                                </td>`;
                 }
-            });
-
-            alert('Data imported successfully!');
-        } else {
-            alert('No data found to import!');
-        }
-    });
-    $(document).on('change', '.checkbox', function () {
-        var columnIndex = $(this).data('column');
-        var allChecked = true;
-
-        $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
-            if (!$(this).is(':checked')) {
-                allChecked = false;
+                newRow += `</tr>`;
+                checkboxBody.append(newRow);
             }
-        });
-
-        if (allChecked) {
-            $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
-                var rowIndex = $(this).data('row');
-                $(`#row_${rowIndex}`).addClass('bg-info');
-            });
-        } else {
-            $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
-                var rowIndex = $(this).data('row');
-                $(`#row_${rowIndex}`).removeClass('bg-info');
-            });
-        }
+           /* var sequenceRow = `<tr>`;
+            for (var k = 0; k < numberOfSubscribers; k++) {
+                sequenceRow += `<td class="custom-row">${k + 1}</td>`;
+            }
+            sequenceRow += `</tr>`;
+            checkboxBody.prepend(sequenceRow); */
+          }else{
+            alert(`
+            يجب اختيار تاريخ البدئ اولا
+            `);
+          }   
+      });
+      $(document).on('change', '.checkbox', function () {
+          var rowIndex = $(this).data('row');
+          var allChecked = true;
+          $(`.checkbox[data-row="${rowIndex}"]`).each(function () {
+              if (!$(this).is(':checked')) {
+                  allChecked = false;
+              }
+          });
+          if (allChecked) {
+              $(`#row_${rowIndex}`).addClass('alert-success');
+          } else {
+              $(`#row_${rowIndex}`).removeClass('alert-success');
+          }
+      });
+      $(document).on('input', '.subscriber-name', function () {
+          var index = $(this).data('index');
+          var nameValue = $(this).val();
+          // $(`#name_${index}`).text(nameValue);
+      });
     });
+  </script>
+  <script>
+    $(document).ready(function () {
+      $('#exportButton').click(function () {
+          var tableData = [];
+          $('table tbody .custom-row').each(function (index, row) {
+              var name = $(row).find('.subscriber-name').val();
+              var date = $(row).find('.view-date').text();
+              var checkboxes = [];
+  
+              $(`.checkbox[data-row="${index}"]`).each(function () {
+                  checkboxes.push($(this).is(':checked'));
+              });
+  
+              tableData.push({
+                  name: name,
+                  date: date,
+                  checkboxes: checkboxes
+              });
+          });
+          localStorage.setItem('tableData', JSON.stringify(tableData));
+          alert('Data exported successfully!');
+      });
+      $('#importButton').click(function () {
+          var tableData = JSON.parse(localStorage.getItem('tableData'));
+          if (tableData) {
+              var tbody = $('table tbody').first();
+              tbody.empty();
+              $('#namesRow').empty();
+              $('#datesRow').empty();
+              var checkboxBody = $('#checkboxBody');
+              checkboxBody.empty();
+  
+              tableData.forEach(function (data, i) {
+                  var newRow = `
+                      <tr class="custom-row" id="row_${i}">
+                          <td>${i + 1}</td>
+                          <td><input type="text" class="form-control subscriber-name" data-index="${i}" value="${data.name}" style="min-width:150px;"/></td>
+                          <td><span class="view-date">${data.date}</span></td>
+                      </tr>`;
+                  tbody.append(newRow);
+                  $('#datesRow').append(`<th class="text-center">${data.date}</th>`);
+                  $('#namesRow').append(`<td><span id="name_${i}">${i+1}</span></td>`);
+              });
+  
+              for (var j = 0; j < tableData.length; j++) {
+                  var newCheckboxRow = `<tr>`;
+                  tableData.forEach(function (data, i) {
+                      var isChecked = data.checkboxes[j] ? 'checked' : '';
+                      newCheckboxRow += `<td>
+                          <div class="form-check">
+                              <input class="form-check-input checkbox" type="checkbox" data-row="${i}" data-column="${j}" ${isChecked}>
+                          </div>
+                      </td>`;
+                  });
+                  newCheckboxRow += `</tr>`;
+                  checkboxBody.append(newCheckboxRow);
+              }
+  
+              tableData.forEach(function (data, i) {
+                  var allChecked = data.checkboxes.every(Boolean);
+                  if (allChecked) {
+                      $(`#row_${i}`).addClass('alert-success');
+                  }
+              });
+  
+              alert('Data imported successfully!');
+          } else {
+              alert('No data found to import!');
+          }
+      });
+      $(document).on('change', '.checkbox', function () {
+          var columnIndex = $(this).data('column');
+          var allChecked = true;
+  
+          $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+              if (!$(this).is(':checked')) {
+                  allChecked = false;
+              }
+          });
+  
+          if (allChecked) {
+              $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+                  var rowIndex = $(this).data('row');
+                  $(`#row_${rowIndex}`).addClass('alert-success');
+              });
+          } else {
+              $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+                  var rowIndex = $(this).data('row');
+                  $(`#row_${rowIndex}`).removeClass('alert-success');
+              });
+          }
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(function () {
+      // تصدير البيانات إلى ملف JSON عند الضغط على زر تصدير ملف
+      $('#exportToFile').click(function (e) {
+          e.preventDefault();  // لمنع إعادة تحميل الصفحة عند الضغط على الرابط
+          var tableData = collectTableData();
+          var firstDate = $('#firstDate').val();
+          var fileName = firstDate ? firstDate + ".json" : "data.json";
+  
+          var blob = new Blob([JSON.stringify(tableData)], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+  
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+  
+          alert('تم تصدير البيانات إلى ملف بنجاح!');
+      });
+  
+      // استيراد البيانات من ملف JSON عند اختيار ملف
+      $('#importFromFile').change(function (e) {
+          var file = e.target.files[0];
+          if (file) {
+              var reader = new FileReader();
+              reader.onload = function (e) {
+                  var fileContent = e.target.result;
+                  try {
+                      var tableData = JSON.parse(fileContent);
+                      populateTableWithData(tableData);
+                      alert('تم استيراد البيانات من الملف بنجاح!');
+                  } catch (error) {
+                      alert('خطأ في قراءة الملف أو تنسيقه.');
+                  }
+              };
+              reader.readAsText(file);
+          }
+      });
+  
+      // جمع البيانات من الجدول
+      function collectTableData() {
+          var tableData = [];
+          $('table tbody .custom-row').each(function (index, row) {
+              var name = $(row).find('.subscriber-name').val();
+              var date = $(row).find('.view-date').text();
+              var checkboxes = [];
+  
+              $(`.checkbox[data-row="${index}"]`).each(function () {
+                  checkboxes.push($(this).is(':checked'));
+              });
+  
+              tableData.push({
+                  name: name,
+                  date: date,
+                  checkboxes: checkboxes
+              });
+          });
+          return tableData;
+      }
+  
+      // ملء الجدول بالبيانات المستوردة
+      function populateTableWithData(tableData) {
+          var tbody = $('table tbody').first();
+          tbody.empty();
+          $('#namesRow').empty();
+          $('#datesRow').empty();
+          var checkboxBody = $('#checkboxBody');
+          checkboxBody.empty();
+  
+          tableData.forEach(function (data, i) {
+              var newRow = `
+                  <tr class="custom-row" id="row_${i}">
+                      <td>${i + 1}</td>
+                      <td><input type="text" class="form-control subscriber-name" data-index="${i}" value="${data.name}" style="min-width:150px;"/></td>
+                      <td><span class="view-date">${data.date}</span></td>
+                  </tr>`;
+              tbody.append(newRow);
+              $('#datesRow').append(`<th class="text-center">${data.date}</th>`);
+              $('#namesRow').append(`<td><span id="name_${i}">${i + 1}</span></td>`);
+          });
+  
+          for (var j = 0; j < tableData.length; j++) {
+              var newCheckboxRow = `<tr>`;
+              tableData.forEach(function (data, i) {
+                  var isChecked = data.checkboxes[j] ? 'checked' : '';
+                  newCheckboxRow += `<td>
+                      <div class="form-check">
+                          <input class="form-check-input checkbox" type="checkbox" data-row="${i}" data-column="${j}" ${isChecked}>
+                      </div>
+                  </td>`;
+              });
+              newCheckboxRow += `</tr>`;
+              checkboxBody.append(newCheckboxRow);
+          }
+  
+          // تلوين الصفوف إذا كانت جميع checkboxes محددة
+          tableData.forEach(function (data, i) {
+              var allChecked = data.checkboxes.every(Boolean);
+              if (allChecked) {
+                  $(`#row_${i}`).addClass('alert-success');
+              }
+          });
+      }
+  
+      // تغيير الحالة للـ checkboxes لتلوين الصفوف
+      $(document).on('change', '.checkbox', function () {
+          var columnIndex = $(this).data('column');
+          var allChecked = true;
+  
+          $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+              if (!$(this).is(':checked')) {
+                  allChecked = false;
+              }
+          });
+  
+          if (allChecked) {
+              $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+                  var rowIndex = $(this).data('row');
+                  $(`#row_${rowIndex}`).addClass('alert-success');
+              });
+          } else {
+              $(`.checkbox[data-column="${columnIndex}"]`).each(function () {
+                  var rowIndex = $(this).data('row');
+                  $(`#row_${rowIndex}`).removeClass('alert-success');
+              });
+          }
+      });
   });
-</script>
+  
+  </script>
 </body>
 </html>
